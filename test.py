@@ -18,7 +18,6 @@ def get_img(div_list):
     position_list = []
     for div in div_list:
         style = div.get_attribute('style')
-
         position_tuple = re.search(r'background-position:\s+-?(\d+)px\s-?(\d+)px', style).groups(1)
         position_list.append((int(position_tuple[0]), int(position_tuple[1])))
     style = div_list[0].get_attribute('style')
@@ -103,33 +102,50 @@ def move(location):
     time.sleep(0.8)
     ActionChains(driver).release(element).perform()
 
-
 if __name__ == "__main__":
     # driver = webdriver.Chrome(r"C:\Users\97193\AppData\Local\Google\Chrome\Application\chromedriver.exe")
-    driver = webdriver.Chrome(r"F:\python_program\pachong_slide_verification\chromedriver.exe")
+    # driver = webdriver.Chrome(r"F:\python_program\pachong_slide_verification\chromedriver.exe")
+
+    options = webdriver.ChromeOptions()
+    options.add_argument('lang=zh_CN.UTF-8')
+    options.add_argument('user-agent="Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"')
+
+    driver = webdriver.Chrome(chrome_options=options, executable_path=r"F:\python_program\pachong_slide_verification\chromedriver.exe")
+
+    time.sleep(1)
     driver.get('https://passport.bilibili.com/login')
+
     time.sleep(1)
 
-    driver.find_element_by_id("login-username").send_keys("test")
-    time.sleep(1)
-    driver.find_element_by_id("login-passwd").send_keys("test")
-    time.sleep(1)
-    driver.find_element_by_class_name("btn-login").click()
+    driver.find_element_by_class_name("on").click()
     time.sleep(1)
 
+    driver.find_element_by_class_name("geetest_radar_tip_content").click()
+    time.sleep(1)
+
+    distance = driver.find_element_by_xpath('.//div[@id="conqu3r_oc_page_register_input"]').location['x'] + 10
+    print("滑块偏移量:{}px".format(distance))
+
+    time.sleep(100)
+    element = driver.find_element_by_xpath('.//span[@class="nc_iconfont btn_slide"]')
+    ActionChains(driver).click_and_hold(element).perform()
+    tracks = get_tracks(distance)
+    for track in tracks:
+        ActionChains(driver).move_by_offset(track, 0).perform()
+    time.sleep(0.8)
+    ActionChains(driver).release(element).perform()
+
+    # time.sleep(1)
     # full_img_div_list = driver.find_elements_by_class_name('gt_cut_fullbg_slice')
     # cut_img_div_list = driver.find_elements_by_class_name('gt_cut_bg_slice')
+    # full_img_position_list, full_img_url = get_img(full_img_div_list)
+    # print(full_img_url)
+    # cut_bg_img_position_list, cut_bg_img_url = get_img(cut_img_div_list)
+    # print(cut_bg_img_url)
+    # full_img = restore_img(requests.get(full_img_url).content, full_img_position_list)
+    # cut_bg_img = restore_img(requests.get(cut_bg_img_url).content, cut_bg_img_position_list)
+    # x = get_move_location(full_img, cut_bg_img)
 
-    full_img_div_list = driver.find_elements_by_class_name('geetest_canvas_slice')
-    cut_img_div_list = driver.find_elements_by_class_name('geetest_canvas_bg')
-
-    full_img_position_list, full_img_url = get_img(full_img_div_list)
-    print(full_img_url)
-    cut_bg_img_position_list, cut_bg_img_url = get_img(cut_img_div_list)
-    print(cut_bg_img_url)
-    full_img = restore_img(requests.get(full_img_url).content, full_img_position_list)
-    cut_bg_img = restore_img(requests.get(cut_bg_img_url).content, cut_bg_img_position_list)
-    x = get_move_location(full_img, cut_bg_img)
     # cut_style = driver.find_element_by_xpath('//div[@class="gt_slice gt_show"]').get_attribute('style')
     # cut_url = re.search(r'url\(\"(.*?)\"\);', cut_style).group(1)
     # cut = Image.open(io.BytesIO(requests.get(cut_url).content))
@@ -138,8 +154,8 @@ if __name__ == "__main__":
     # cut.save("cut.png")
     # cut_bg.save("cut_bg.png")
     # x = get_move_location2("cut.png", "cut_bg.png")
-    print("滑块偏移量:{}px".format(x))
-    # print(location)
-    move(x)
-    time.sleep(5)
+    # print("滑块偏移量:{}px".format(x))
+    # # print(location)
+    # move(x)
+    # time.sleep(5)
     driver.quit()
