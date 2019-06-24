@@ -113,7 +113,9 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(chrome_options=options, executable_path=r"F:\python_program\pachong_slide_verification\chromedriver.exe")
 
     time.sleep(1)
-    driver.get('https://passport.bilibili.com/login')
+    url = "http://www.gsxt.gov.cn"
+    driver.get(url)
+    # driver.get('https://passport.bilibili.com/login')
 
     time.sleep(1)
 
